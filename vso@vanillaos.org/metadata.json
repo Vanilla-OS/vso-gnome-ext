@@ -1,0 +1,9 @@
+{
+  "name": "Vanilla OS On-going Update Check",
+  "description": "Show if the system is performing an update in the background.",
+  "uuid": "vso@vanillaos.org",
+  "version": 1,
+  "shell-version": [
+    "44"
+  ]
+}
