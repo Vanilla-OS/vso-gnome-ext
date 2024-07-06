@@ -5,39 +5,32 @@
  * Copyright: 2023
  */
 
-// following imports will be useful once we migrate the extension to GNOME 45
-// import St from "gi://St";
-// import GObject from "gi://GObject";
-// import Gio from "gi://Gio";
-// import GLib from "gi://GLib";
+import St from "gi://St";
+import GObject from "gi://GObject";
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
 
-// import * as Main from "resource:///org/gnome/shell/ui/main.js";
-// import * as ExtensionUtils from "resource:///org/gnome/shell/misc/util.js";
-// import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
-// import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
+import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
 
-// import {
-//   gettext as _,
-//   ngettext as __,
-// } from "resource:///org/gnome/shell/extensions/extension.js";
+import {
+  Extension,
+  gettext as _,
+} from "resource:///org/gnome/shell/extensions/extension.js";
 
 const GETTEXT_DOMAIN = "vso-update-check";
-
-const { GObject, St, Gio, GLib, Gtk } = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-
-const _ = ExtensionUtils.gettext;
 
 /* Defaults */
 const FILE_CHECK_TIMEOUT = 60; // seconds
 const ABROOT_STAGE_FILE = "/tmp/ABSystem.Upgrade.stage";
 const ABROOT_USER_LOCK_FILE = "/tmp/ABSystem.Upgrade.user.lock";
 
-const VSOUpdateCheckIndicator = GObject.registerClass(
-  class VSOUpdateCheckIndicator extends PanelMenu.Button {
+const VSOUpdateIndicator = GObject.registerClass(
+  {
+    GTypeName: "VSOUpdateIndicator",
+  },
+  class VSOUpdateIndicator extends PanelMenu.Button {
     _init() {
       super._init(0.0, _("Vanilla OS On-going Update Check"));
 
@@ -101,24 +94,18 @@ const VSOUpdateCheckIndicator = GObject.registerClass(
   }
 );
 
-class VSOUpdateCheckExtension {
-  constructor(uuid) {
-    this._uuid = uuid;
-
-    ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
+export default class VSOUpdateCheckExtension extends Extension {
+  constructor(metadata) {
+    super(metadata);
   }
 
   enable() {
-    this._updateCheckIndicator = new VSOUpdateCheckIndicator();
-    Main.panel.addToStatusArea(this._uuid, this._updateCheckIndicator);
+    this._updateCheckIndicator = new VSOUpdateIndicator();
+    Main.panel.addToStatusArea(this.uuid, this._updateCheckIndicator);
   }
 
   disable() {
     this._updateCheckIndicator.destroy();
     this._updateCheckIndicator = null;
   }
-}
-
-function init(meta) {
-  return new VSOUpdateCheckExtension(meta.uuid);
 }
