@@ -4,6 +4,7 @@
   "uuid": "vso@vanillaos.org",
   "version": 1,
   "shell-version": [
-    "46"
+    "46",
+    "47"
   ]
 }
