@@ -35,6 +35,8 @@ const VSOUpdateIndicator = GObject.registerClass(
     _init() {
       super._init(0.0, _("Vanilla OS On-going Update Check"));
 
+      this.stopChecking = false;
+
       this.add_child(
         new St.Icon({
           icon_name: "folder-download-symbolic",
@@ -75,6 +77,9 @@ const VSOUpdateIndicator = GObject.registerClass(
      * indicator accordingly and schedules the next check.
      */
     _checkUpdateFile() {
+      if (this.stopChecking)
+          return;
+
       let file = Gio.File.new_for_path(OPERATION_LOCK_FILE);
 
       if (file.query_exists(null)) {
@@ -103,6 +108,7 @@ export default class VSOUpdateCheckExtension extends Extension {
   }
 
   disable() {
+    this._updateCheckIndicator.stopChecking = true;
     this._updateCheckIndicator.destroy();
     this._updateCheckIndicator = null;
   }
