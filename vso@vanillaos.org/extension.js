@@ -23,8 +23,9 @@ const GETTEXT_DOMAIN = "vso-update-check";
 
 /* Defaults */
 const FILE_CHECK_TIMEOUT = 60; // seconds
-const ABROOT_STAGE_FILE = "/tmp/ABSystem.Upgrade.stage";
-const ABROOT_USER_LOCK_FILE = "/tmp/ABSystem.Upgrade.user.lock";
+const OPERATION_LOCK_FILE = "/run/abroot/operation.lock";
+const FINALIZING_FILE = "/run/abroot/finalizing"
+const FINISHED_OPERATION_FILE = "/run/abroot/finished"
 
 const VSOUpdateIndicator = GObject.registerClass(
   {
@@ -61,10 +62,7 @@ const VSOUpdateIndicator = GObject.registerClass(
      * Stop the update and send the request.
      */
     _stopOnGoingUpdate() {
-      let file = Gio.File.new_for_path(ABROOT_USER_LOCK_FILE);
-      file.replace_contents("", null, false, Gio.FileCreateFlags.NONE, null);
-
-      this.destroy();
+      GLib.spawn_command_line_async('pkexec abroot upgrade --cancel');
 
       Main.notify(
         _("Stop Update Request Sent"),
@@ -77,7 +75,7 @@ const VSOUpdateIndicator = GObject.registerClass(
      * indicator accordingly and schedules the next check.
      */
     _checkUpdateFile() {
-      let file = Gio.File.new_for_path(ABROOT_STAGE_FILE);
+      let file = Gio.File.new_for_path(OPERATION_LOCK_FILE);
 
       if (file.query_exists(null)) {
         this.show();
